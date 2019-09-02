@@ -1,0 +1,48 @@
+﻿@model App2.Models.User
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+</head>
+<body>
+    <div id="login-div"> 
+        @using (Html.BeginForm("Authorise", "Login", FormMethod.Post))
+        {
+        <table>
+            <tr>
+                <td></td>
+                <td style="text-decoration:underline" >Login</td>
+            </tr>
+            <tr>
+                <td>@Html.LabelFor(model => model.Username)</td>
+                <td>@Html.EditorFor(model => model.Username)</td>
+            </tr>
+
+            <tr>
+                <td>@Html.LabelFor(model => model.Password)</td>
+                <td>@Html.EditorFor(model => model.Password)</td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <label class="danger">@Html.DisplayFor(model=>model.LoginErrormsg)</label>
+                </td>
+            </tr>
+            <tr>    
+                <td></td>
+                <td>
+                    <input type="reset" name="reset" value="clear" />
+                    <input type="submit" name="login" value="login"/>
+                </td>
+                
+            </tr>
+        </table>
+        }
+    </div>
+</body>
+</html>

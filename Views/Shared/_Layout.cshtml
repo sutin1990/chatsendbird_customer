@@ -1,0 +1,233 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title APP2</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    <style>
+        .btn ic-invite {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    @{
+
+        if (Session["username"] == null)
+        {
+            Response.Redirect("/Login/Index");
+        }
+
+    }
+
+    <h1>APP2</h1>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
+                    <li>@Html.ActionLink("About", "About", "Home")</li>
+                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+
+                </ul>
+                <ul class="nav navbar-nav">
+                    <li style="text-decoration:underline">@Html.ActionLink("User ID: " + Session["username"].ToString(), "Index", "Home")</li>
+                    <li>@Html.ActionLink("Logout", "Logout", "Login")</li>
+                </ul>
+
+            </div>
+
+            <div style="text-align:right;">
+
+            </div>
+        </div>
+    </div>
+    <div class="container body-content">
+        @RenderBody()
+        <div id="sb_widget"></div>
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+        </footer>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+
+<script src="~/Scripts/SendBird.min.js"></script>
+<!-- <script src="https://sample.sendbird.com/widget/build/widget.SendBird.js"></script> -->
+@*<script src="~/dist/widgit.SendBird.js" type="module"></script>*@
+<script src="~/Scripts/dist/widget.SendBird.js"></script>
+@*<script src="~/Scripts/src/js/widget.js" type="module"></script>*@
+<script>
+
+    var userid = "@Session["username"]";
+    $.ajax({
+        type: 'GET',
+        url: 'UserSendbird/FindUser',
+        cache: false,
+        data: { "userid": userid },
+        contentType: "application/json",
+        dataType: "json",
+        success: function (result) {
+           // console.log(result.nickname);
+            if (result.error) {
+                alert(result.message);
+            } else {
+                var nickname = result.nickname;
+               
+                sbWidget.startWithConnect('75DC34C9-03AE-4573-A69A-63FD75B7300E', userid, nickname, function (e) {
+                    var sb = new SendBird({ appId:'75DC34C9-03AE-4573-A69A-63FD75B7300E'});
+                    console.log(sbWidget.listBoard);
+                    //sbWidget.listBoard
+                    var userIds = ['vd_centara', 'Foo', 'Jacob'];
+                    var DISTINCT = true;
+                    var NAME = "groupchannalcentara";
+                    var COVER_URL = "https://www.centarahotelsresorts.com/corporatechr/dist/images/logo/main-chr-logo.png";
+                    var DATA = "Centara hotel";
+                    var CUSTOM_TYPE = "CUSTOM_TYPE";
+                    var is_public = false;
+
+                    var params = new sb.GroupChannelParams();
+                    params.isPublic = is_public;
+                    params.isEphemeral = false;
+                    params.isDistinct = DISTINCT;
+                    params.addUserIds(userIds);
+                    //params.operatorIds = ['vd_centara','jacob'];   // or .operators(Array<User>)
+                    params.name = NAME;
+                    //params.coverUrl = COVER_URL;
+                    //params.channelUrl = "sendbird_open_channel_55873_80d2db5e92982a27902efc0e23a548bba0849187"; // In case of a group channel, you can create a new channel by specifying its unique channel URL in a 'GroupChannelParams' object.
+                    params.coverImage = "https://www.centarahotelsresorts.com/corporatechr/dist/images/logo/main-chr-logo.png";       // or .coverUrl = COVER_URL;
+                    params.data = DATA;
+                    params.customType = CUSTOM_TYPE;
+                    //params.isHidden = true;
+                    params.includeEmpty = true;
+
+                    sb.GroupChannel.createChannel(params, function (groupChannel, error) {
+                        if (error) {
+                            console.log(error);
+                            return;
+                        } else {
+                            console.log('createsuccess', groupChannel);
+                        }
+                    });
+
+                    var ChannelHandler = new sb.ChannelHandler();
+                    ChannelHandler.onMentionReceived = function (openChannel, user) {
+                        console.log(openChannel);
+                        //alert('hi chanannel');
+                    };
+                    //console.log(ChannelHandler.onMessageReceived);
+                });
+
+                //$(".ic-new-chat")[0].classList.toggle("hidden");
+                //$(".ic-option")[0].classList.toggle("hidden");
+            }
+            //var CustomID = result.user_id;
+        },
+        error: function (ob, err) {
+            console.error(ob);
+            alert(err);
+        }
+    });
+    //https://api-75DC34C9-03AE-4573-A69A-63FD75B7300E.sendbird.com/v3/users/
+    //sbWidget.start('75DC34C9-03AE-4573-A69A-63FD75B7300E');
+
+    //var x = document.getElementsByClassName("btn ic-invite");
+    //var i;
+    //for (i = 0; i < x.length; i++) {
+    //    x[i].classList.toggle("hidden");
+    //}
+
+
+   // $(".ic-invite")[0].classList.toggle("hidden");
+
+        //var refreshId = setInterval(function () {
+
+        //    if ($(".ic-invite")[0] && refreshId == 1) {
+        //        //console.log($(".ic-invite"));
+
+        //        $(".ic-invite")[0].classList.toggle("hidden");
+
+
+
+        //        console.log(refreshId);
+        //    } if ($(".ic-invite")[0] == undefined) {
+
+        //        //clearInterval(refreshId);
+        //    }
+
+        //}, 1000);
+
+    //setInterval(function () { console.log($(".ic-invite")[0]) }, 1000);
+    //if ($(".chat-board")) {
+    //    //alert('hi');
+    //    console.log('chat', $(".ic-invite").prevObject[0]);
+    //    //  $(".ic-invite")[0].classList.toggle("hidden");
+    //}
+
+    //var applicationUserListQueryByIds = sb.createApplicationUserListQuery();
+    //applicationUserListQueryByIds.userIdsFilter = ['vd_centara', 'Jacob'];
+    //applicationUserListQueryByIds.next(function (users, error) {
+    //    if (error) {
+    //        return;
+    //    } else {
+    //        console.log(users);
+    //    }
+    //});
+
+    //var users = ['Asty'];
+    //var friendListQuery = sb.createFriendListQuery();
+    //friendListQuery.next(function (users, error) {
+    //    if (error) {
+    //        return;
+    //    } else {
+    //        alert('hi');
+    //    }
+
+    //    console(users);
+    //});
+
+    //console.log(sb);
+    // = 1;
+    //var filteredQuery = sb.GroupChannel.createMyGroupChannelListQuery();
+    //filteredQuery.userIdsExactFilter = ['pod', 'T_tin2'];
+    //filteredQuery.next(function (groupChannels, error) {
+
+    //});
+
+
+    //var applicationUserListQueryByIds = sb.createApplicationUserListQuery();
+    //applicationUserListQueryByIds.userIdsFilter = ['T_tin2','pod'];
+    //applicationUserListQueryByIds.next(function (users, error) {
+    //    console.log(error);
+    //    if (error) {
+    //        //console.log(error);
+    //        return;
+    //    }
+    //});    //var sbs = new SendBird('75DC34C9-03AE-4573-A69A-63FD75B7300E');
+    //var UserEventHandler = new sbs.UserEventHandler();
+
+    //UserEventHandler.onFriendsDiscovered = function (users) {};
+    ////console.log(UserEventHandler.onFriendsDiscovered);
+    //sbs.addUserEventHandler('a7ea83893b3e911ea43da3ae39ab368967221ed2', UserEventHandler);
+
+    ////console.log(sbWidget);
+    //    var list = ['pod1', 'tin1'];
+
+        //console.log(list);
+    //sbWidget.setUserList('sendbird_group_channel_137287723_07e33e8b58e8f3d71f7a7cccb829ccc3ffbfa96c', list, function () { });
+</script>
+</html>
